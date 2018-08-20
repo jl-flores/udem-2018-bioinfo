@@ -5,20 +5,23 @@ Repository for code used during internship at UdeM in summer of 2018. Scripts cr
 # Table of contents
 1. [genome-manip](#genome-manip)
 2. [signature-norm](#signature-norm)
-    1. [Sub paragraph](#subparagraph1)
-3. [Another paragraph](#paragraph2)
+3. [distance-calc](#distance-calc)
 
 ## genome-manip <a name="genome-manip"></a>
 Retrieve different subsets of the genome from a local file.
 - script1_get_mRNA.py
 - script2_get_ncRNA.py
 
-## Some paragraph <a name="signature-norm"></a>
-The first paragraph text
+## signature-norm <a name="signature-norm"></a>
+Folds fixed-length substructures within transcripts from a local file to calculate to compute baseline statistics for each motif. Save the frequency counts for these substructures into a parquet file.
+- Normalization_fold_all_mrna.py (rename to more meaningful)
+- Normalization_fold_all_mrna_ints_upd.py
+- Normalization_get_stdev.py
+- Normalization_get_correlation.py
 
-### Sub paragraph <a name="subparagraph1"></a>
-This is a sub paragraph, formatted in heading 3 style
-
-## Another paragraph <a name="paragraph2"></a>
-The second paragraph text
-
+## distance-calc <a name="distance-calc"></a>
+Calculate the distance between the query RNA and all substructures using different metrics (e.g. Jaccard index, Euclidean distance).
+- Distance_measuring.py
+- get_distribution.py
+- Distance_euclidean.py
+- Distance_log_odds.py
