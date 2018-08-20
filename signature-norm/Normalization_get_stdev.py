@@ -1,12 +1,12 @@
 """Created:  Tuesday July 10, 2018
-   Modified: Monday August 13, 2018
+   Modified: Monday August 20, 2018
    Jorge Luis Flores
-   Generates a normalizing vector of 940 structural motifs from the collection of all mRNAs
-   This vector is the average of all windows folded and will be used to normalize"""
+   Computes the standard deviation for the normalizing vector. 
+   This can be done either from pre-computed frequency vectors, or by computing 
+   the frequency vectors for the motifs in-place."""
 import sys
 sys.path.append('/u/floresj/Pyth_modules/')
 import multiprocessing
-import subprocess
 from datetime import datetime as dt
 
 from Bio.SeqIO import parse
@@ -27,12 +27,11 @@ def get_stdev_signs(rna, mcff_args='-t 1', mcff_timeout=300, win_size=79, win_sk
        win_size      = length of windows to use
        win_skip      = how many nucleotides to move to the right each time'''
     
-    # aptamer-21 is 79-nucleotides long
     win_count = 0
     stdev_inside_sum = np.zeros(940)
     
     for i in range(0, len(rna.seq), win_skip):
-        # exits loop when the passed window is shorter than 79 nt
+        # exits loop when the passed window is shorter than win_size
         if len(rna.seq[i:i+win_size]) < win_size:
             break
         
@@ -48,12 +47,12 @@ def get_stdev_signs(rna, mcff_args='-t 1', mcff_timeout=300, win_size=79, win_sk
     return ( stdev_inside_sum, win_count )
 
 def get_stdev_sums( rna_freq_df ):
+    '''Takes as an argument a df of pre-computed motif frequencies for a single RNA.
+       Returns a vector of the "runnning sum" for the standard deviation.'''
     stdev_inside_sum = np.zeros(940)
 
-    # iterate over all the calculated windows in the dataframe
+    # iterate over all the calculated windows
     for ind, rna_row in rna_freq_df.iterrows():
-        
-        # separate dotbs and frequency vector
         dotbs       = rna_row.values[0]
         freq_vector = rna_row.values[1:]
         
@@ -68,8 +67,7 @@ if __name__ == '__main__':
         '''Object used for multithreading'''
         def __init__(self, target):
             self.target = target                # how many TimeCounters must be used
-            self.count = 0                      # how many TimeCounters have been instantiated
-                                                # in this case, this corresponds to the number of transcripts processed
+            self.count = 0                      # number of transcripts processed
             self.stdev_sum = np.zeros(940)      # array stores all the results
             #self.nb_windows = 0                 # counts how many windows are used
 
@@ -79,7 +77,7 @@ if __name__ == '__main__':
             #self.nb_windows += nb_win           # keeps track of number of windows used
             self.count += 1                     # keeps track of number of RNAs processed
             
-            # prints current status
+            # status report
             if self.count % 100 == 0 or self.count == self.target:
                 print(f'{self.count}\tout of\t{self.target} were processed.')
                 
@@ -90,7 +88,7 @@ if __name__ == '__main__':
     
     # initialize logging file
     with open('/u/floresj/Scripts_log/mrna_normalization_stdev_log.txt', 'w') as fp:
-        fp.write('Version: Monday August 13, 2018\n')
+        fp.write('Version: Monday August 20, 2018\n')
         fp.write('Time\t\tProcessed\n')
     
     # load transcripts from file

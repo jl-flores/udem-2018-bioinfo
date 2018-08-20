@@ -1,12 +1,11 @@
 """Created:  Tuesday July 10, 2018
-   Modified: Monday August 13, 2018
+   Modified: Monday August 20, 2018
    Jorge Luis Flores
    Generates 13 dataframes containing vectors for all calculated windows for all mRNAs
    These vectors contain nb_dotbs, [ALL_MOTIFS]"""
 import sys
 sys.path.append('/u/floresj/Pyth_modules/')
 import multiprocessing
-import subprocess
 
 from datetime import datetime as dt
 
@@ -31,18 +30,17 @@ def get_sum_signs_int(rna, mcff_args='-t 1', mcff_timeout=300, win_size=79, win_
        win_size      = length of windows to use
        win_skip      = how many nucleotides to move to the right each time'''
     
-    # aptamer-21 is 79-nucleotides long
     win_count = 0
     all_sign_vectors = []
     dotbs_in_win = []
     nt_position = []
     
     for i in range(0, len(rna.seq), win_skip):
-        # exits loop when the passed window is shorter than 79 nt
+        # exits loop when the passed window is shorter than win_size
         if len(rna.seq[i:i+win_size]) < win_size:
             break
         
-        # calculates the signature for passed window
+        # calculate the signature for passed window
         cur_win = rna.seq[i:i+win_size]
         dotbs, shapes = mv.dotbs_and_shapes(cur_win, parameters=mcff_args, timeout_in_seconds=mcff_timeout)
         
@@ -51,10 +49,8 @@ def get_sum_signs_int(rna, mcff_args='-t 1', mcff_timeout=300, win_size=79, win_
         
         all_sign_vectors.append(cur_signature_vector)
         
-        # keeps track of the dotbs used for each window
+        # keeps track of the dotbs and nt position
         dotbs_in_win.append(nb_dotbs)
-        
-        # keeps track of the nucleotide position
         nt_position.append(i)
     
     int_vectors = np.array( [arr.astype(int) for arr in all_sign_vectors] )
@@ -66,8 +62,7 @@ if __name__ == '__main__':
         '''Object used for multithreading'''
         def __init__(self, target):
             self.target = target                # how many TimeCounters must be used
-            self.count = 0                      # how many TimeCounters have been instantiated
-                                                # in this case, this corresponds to the number of transcripts processed
+            self.count = 0                      # number of transcripts processed
             self.all_df = {}                    # stores the dataframe of each mRNA
 
         def print_progress(self, met_result):
@@ -83,7 +78,6 @@ if __name__ == '__main__':
             
             # use nt_position as index
             vector_df = pd.DataFrame( vector_list, columns = ['dotbs_in_win']+ALL_MOTIFS, index=nt_position, dtype=np.uint16 )
-            
             self.all_df[rna_name] = vector_df
             
             self.count += 1                     # keeps track of number of RNAs processed
@@ -92,7 +86,7 @@ if __name__ == '__main__':
             if self.count % 100 == 0 or self.count == self.target:
                 print(f'{dt.now() - start_time}\t{self.count}')
             
-            # outputs to a file once TRANSCRIPTS_PER_FILE mRNAs have been processed
+            # outputs to file once enough mRNAs have been processed
             if ( (self.count % TRANSCRIPTS_PER_FILE == 0) or (self.count == self.target) ):
                 total_df = pd.concat( compteur.all_df )
                 if self.count % TRANSCRIPTS_PER_FILE == 0:
@@ -103,16 +97,14 @@ if __name__ == '__main__':
                 # flushes dictionary
                 total_df = pd.DataFrame()
                 self.all_df = {}
-                
-                # announce
                 print('\tTranscripts were saved to file, and memory was flushed.')
     
-    print('Version: Monday August 13, 2018')
+    print('Version: Monday August 20, 2018')
     print('Time\t\tProcessed')
     
     # file to store nb_win
     with open('/u/floresj/mRNA_norm/mRNA_vectors/updated/mrna_folded_t5_nbwin.txt', 'w') as fp:
-        fp.write('Version: Monday August 13, 2018\n')
+        fp.write('Version: Monday August 20, 2018\n')
         fp.write(f'Windows calculated every {WIN_SKIP} nucleotides, using {MCFF_T}.\n')
         fp.write('rna_id\tnb_win\n')
     
@@ -127,8 +119,8 @@ if __name__ == '__main__':
     start_time = dt.now()
     
     # multiprocessing setup
-    multiprocessing.set_start_method('spawn')
     compteur = TimeCounter(len(all_mrna))
+    multiprocessing.set_start_method('spawn')
     pool = multiprocessing.Pool(40)
 
     for rna in all_mrna:
