@@ -13,8 +13,8 @@ Retrieve different subsets of the genome from a local file.
 - script2_get_ncRNA.py
 
 ## signature-norm <a name="signature-norm"></a>
-Folds fixed-length substructures within transcripts from a local file to calculate to compute baseline statistics for each motif. Save the frequency counts for these substructures into a parquet file.
-- Normalization_fold_all_mrna.py (rename to more meaningful)
+Fold fixed-length substructures within transcripts from a local file to calculate to compute baseline statistics for each motif. Save the frequency counts for these substructures into a parquet file.
+- Normalization_get_avg.py
 - Normalization_fold_all_mrna_ints_upd.py
 - Normalization_get_stdev.py
 - Normalization_get_correlation.py
