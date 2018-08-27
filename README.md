@@ -22,6 +22,8 @@ Fold fixed-length substructures within transcripts from a local file to calculat
 ## distance-calc <a name="distance-calc"></a>
 Calculate the distance between the query RNA and all substructures using different metrics (e.g. Jaccard index, Euclidean distance).
 - Distance_measuring.py
+- Distance_measuring_pt10_1.py
+- Distance_measuring_pt10_2.py
 - get_distribution.py
 - Distance_euclidean.py
 - Distance_log_odds.py
