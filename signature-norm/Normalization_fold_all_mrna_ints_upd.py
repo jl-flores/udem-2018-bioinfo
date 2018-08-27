@@ -17,7 +17,7 @@ import pandas as pd
 ALL_MOTIFS = mv.list_of_all_motifs()
 TRANSCRIPTS_PER_FILE = 4000
 WIN_SKIP = 4
-MCFF_T = '-t 5'
+MCFF_T = '-t 1'
 
 def get_sum_signs_int(rna, mcff_args='-t 1', mcff_timeout=300, win_size=79, win_skip=WIN_SKIP):
     '''Takes as an argument an RNA as a SeqRecord object.
@@ -90,9 +90,9 @@ if __name__ == '__main__':
             if ( (self.count % TRANSCRIPTS_PER_FILE == 0) or (self.count == self.target) ):
                 total_df = pd.concat( compteur.all_df )
                 if self.count % TRANSCRIPTS_PER_FILE == 0:
-                    total_df.to_parquet(f'/u/floresj/mRNA_norm/mRNA_vectors/updated/mrna_folded_t5_subset{int(self.count/TRANSCRIPTS_PER_FILE)}')
+                    total_df.to_parquet(f'/u/floresj/mRNA_norm/mRNA_vectors/updated/mrna_folded_t1_subset{int(self.count/TRANSCRIPTS_PER_FILE)}')
                 else:
-                    total_df.to_parquet(f'/u/floresj/mRNA_norm/mRNA_vectors/updated/mrna_folded_t5_subset{int(self.count//TRANSCRIPTS_PER_FILE)+1}')
+                    total_df.to_parquet(f'/u/floresj/mRNA_norm/mRNA_vectors/updated/mrna_folded_t1_subset{int(self.count//TRANSCRIPTS_PER_FILE)+1}')
                 
                 # flushes dictionary
                 total_df = pd.DataFrame()
